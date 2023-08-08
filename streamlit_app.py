@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
-import io
-import csv
-import os
-import shutil
+import base64
 
 class DataCleanserApp:
 
@@ -41,14 +38,12 @@ class DataCleanserApp:
         if st.button("Delete Expired User IDs"):
             self.AcademyUserData = self.deleteExpiredUsers(self.AcademyUserData, self.ExpiredUserIDs, 'User ID')
             self.data_deleted = True
-            self.check_export_status()
             st.write("Expired User IDs Deleted")
 
     def deleteExpiredUserEmailAddresses(self):
         if st.button("Delete Expired User Email Addresses"):
             self.AcademyUserData = self.deleteExpiredUsers(self.AcademyUserData, self.ExpiredUserEmailAddresses, 'Email Address')
             self.data_deleted = True
-            self.check_export_status()
             st.write("Expired User Email Addresses Deleted")
 
     def deleteExpiredUsers(self, user_data, expired_users, column_name):
@@ -56,15 +51,11 @@ class DataCleanserApp:
         return user_data
 
     def exportCleansedAcademyUserData(self):
-        if st.button("Export Cleansed Academy User Data"):
+        if self.data_deleted and st.button("Export Cleansed Academy User Data"):
             csv = self.AcademyUserData.to_csv(index=False)
             b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
             href = f'<a href="data:file/csv;base64,{b64}" download="CleansedAcademyUserData.csv">Download CSV File</a>'
             st.markdown(href, unsafe_allow_html=True)
-
-    def check_export_status(self):
-        if self.data_deleted:
-            self.export_button.config(state=tk.NORMAL)
 
 def main():
     st.title("Data Cleansing")
@@ -78,3 +69,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
